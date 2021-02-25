@@ -95,7 +95,7 @@ function _paintBlochSphereDisplay_indicator(
     let {dx, dy, dz} = MathPainter.coordinateSystem(u);
 
     let p = c.plus(dx.times(x)).plus(dy.times(y)).plus(dz.times(z));
-    let r = 10 / (1 + x / 6);
+    let r = 3.8 / (1 + x / 6);
 
     // Draw state indicators (in not-quite-correct 3d).
     painter.strokeLine(c, p, 'black', 1.5);
@@ -127,11 +127,16 @@ function paintBlochSphereDisplay(
         painter,
         qubitDensityMatrix,
         drawArea,
-        focusPoints = [],
-        backgroundColor = Config.DISPLAY_GATE_BACK_COLOR) {
+        focusPoints = []) {
     let c = drawArea.center();
     let u = Math.min(drawArea.w, drawArea.h) / 2;
     let {dx, dy, dz} = MathPainter.coordinateSystem(u);
+
+    let backgroundColor = Config.DISPLAY_GATE_BACK_COLOR;
+    if (!qubitDensityMatrix.hasNaN()) {
+        [x, y, z] = qubitDensityMatrix.qubitDensityMatrixToBlochVector();
+        backgroundColor = _getColorFromBlochVector(x, y, z);
+    }
 
     // Draw sphere and axis lines (in not-quite-proper 3d).
     painter.fillCircle(c, u, backgroundColor);
@@ -149,8 +154,7 @@ function paintBlochSphereDisplay(
         painter.printParagraph("NaN", drawArea, new Point(0.5, 0.5), 'red');
     } else {
         [x, y, z] = qubitDensityMatrix.qubitDensityMatrixToBlochVector();
-        let fillColor = _getColorFromBlochVector(x, y, z);
-        _paintBlochSphereDisplay_indicator(painter, x, y, z, drawArea, fillColor);
+        _paintBlochSphereDisplay_indicator(painter, x, y, z, drawArea, Config.DISPLAY_GATE_FORE_COLOR);
     }
 
     _paintBlochSphereDisplay_tooltips(painter, drawArea, x, y, z, focusPoints);

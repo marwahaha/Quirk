@@ -412,6 +412,27 @@ class MathPainter {
     }
 
     /**
+     * @param {!number} x
+     * @param {!number} y
+     * @param {!number} z
+     */
+    static _getColorFromBlochVector(
+            x,
+            y,
+            z) {
+        let color = "#";
+        for (let c of [x, y, z]) {
+            let hex = Math.round(255*(c+1)/2).toString(16);
+            if (hex.length < 2) {
+                color += '0';
+            }
+            color += hex;
+        }
+        return color;
+    };
+
+
+    /**
      * @param {!Painter} painter
      * @param {!Matrix} operation
      * @param {!Rect} drawArea
@@ -466,6 +487,9 @@ class MathPainter {
             toArray(), '#666');
         // Rotation axis.
         painter.strokeLine(c.plus(dAxis), c.plus(dAxis.times(-1)), 'black', 2);
+        let [x, y, z] = axis;
+        painter.fillCircle(c.plus(dAxis), 4, MathPainter._getColorFromBlochVector(x,y,z));
+        painter.fillCircle(c.plus(dAxis.times(-1)), 4, MathPainter._getColorFromBlochVector(-x, -y, -z));
 
         // Find perpendicular axes, for drawing the rotation arrow circles.
         let norm = e => Math.sqrt(e.adjoint().times(e).cell(0, 0).real);
